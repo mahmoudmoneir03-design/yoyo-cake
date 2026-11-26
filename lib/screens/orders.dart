@@ -37,13 +37,18 @@ class OrderTile extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final d = parseDate(o.date);
     final late = o.isOpen && o.date.compareTo(today()) < 0;
+    // طلب ميعاده بكره: لون مميّز عشان يلفت النظر
+    final tomorrow = o.isOpen && dayDiff(o.date, today()) == 1;
+    final hi = warnC(context);
     final sub = o.desc.isEmpty ? o.occasion : '${o.occasion} · ${o.desc}';
     return Card(
       margin: EdgeInsets.zero,
       elevation: 0,
+      color: tomorrow ? hi.withAlpha(40) : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: cs.outlineVariant),
+        side: BorderSide(
+            color: tomorrow ? hi : cs.outlineVariant, width: tomorrow ? 2 : 1),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -57,7 +62,7 @@ class OrderTile extends StatelessWidget {
                 width: 54,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                    color: cs.secondaryContainer,
+                    color: tomorrow ? hi.withAlpha(110) : cs.secondaryContainer,
                     borderRadius: BorderRadius.circular(12)),
                 child: Column(
                   children: [
@@ -90,6 +95,7 @@ class OrderTile extends StatelessWidget {
                       runSpacing: 4,
                       children: [
                         if (late) Pill('متأخر', color: badC(context)),
+                        if (tomorrow) Pill('بكره', color: hi),
                         if (o.isOpen) Pill(statusLabel[o.status] ?? ''),
                         payPill(context, o),
                       ],
